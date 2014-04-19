@@ -69,6 +69,7 @@ public class Mailer extends JavaPlugin {
                     message.append(args[i]).append(' ');
                 message.substring(0, message.length() - 1);
                 Mail mail = new Mail();
+                mail.setMail(message.toString());
                 mail.setDeleted(false);
                 mail.setMailTime(new Date());
                 mail.setPlayerFrom(sender.getName());
