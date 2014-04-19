@@ -1,0 +1,26 @@
+name: Mailer
+version: 1.0
+description: Quick & Dirty Mail
+author: zifnab06
+website: http://github.com/junctionat/Mailer
+
+main: at.junction.mailer.Mailer
+database: true
+
+commands:
+  mail:
+    description: Access your mailbox
+    permission: mailer.user
+    usage: /mail <user> <message>
+  mail-override:
+    description: Staff overrides
+    permission: mailer.staff
+    usage: /mail-override <!from|!to|!read> <playername> [<id>]
+
+permissions:
+  mailer.staff:
+    description: Allows player to check other's inbox
+    default: op
+  mailer.user:
+    description: Allows use of basic mail
+    default: true
