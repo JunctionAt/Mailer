@@ -17,34 +17,80 @@ public class Mail {
     }
 
     @Id
-    public int id;
+    private int id;
 
     @NotNull
-    public String playerFrom;
+    private String playerFrom;
 
     @NotNull
-    public String playerTo;
+    private String playerTo;
 
     @NotEmpty
-    public String mail;
+    private String mail;
 
     @NotNull
-    public Date mailTime;
+    private Date mailTime;
 
     @NotNull
-    public MailStatus status;
+    private MailStatus status;
 
     @NotNull
-    public boolean deleted;
+    private boolean deleted;
 
-    public String humanizeDate(){
-        int time = (int) (new Date().getTime() - mailTime.getTime()) / 1000 / 3600;
-
-        if (time == 1){
-            return "1 hour ago";
-        } else {
-            return String.format("%d hours ago", time);
-        }
-
+    public void setId(int id) {
+        this.id = id;
     }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public void setPlayerFrom(String playerFrom) {
+        this.playerFrom = playerFrom;
+    }
+
+    public String getPlayerFrom() {
+        return this.playerFrom;
+    }
+
+    public void setPlayerTo(String playerTo) {
+        this.playerTo = playerTo;
+    }
+
+    public String getPlayerTo() {
+        return this.playerTo;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
+    }
+
+    public String getMail() {
+        return this.mail;
+    }
+
+    public void setMailTime(Date date) {
+        this.mailTime = date;
+    }
+
+    public Date getMailTime() {
+        return this.mailTime;
+    }
+
+    public void setStatus(MailStatus status) {
+        this.status = status;
+    }
+
+    public MailStatus getStatus() {
+        return this.status;
+    }
+
+    public boolean getDeleted() {
+        return this.deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
 }

@@ -69,20 +69,20 @@ public class Mailer extends JavaPlugin {
                     message.append(args[i]).append(' ');
                 message.substring(0, message.length() - 1);
                 Mail mail = new Mail();
-                mail.deleted = false;
-                mail.mailTime = new Date();
-                mail.playerFrom = sender.getName();
-                mail.playerTo = sendTo;
-                mail.status = Mail.MailStatus.UNREAD;
+                mail.setDeleted(false);
+                mail.setMailTime(new Date());
+                mail.setPlayerFrom(sender.getName());
+                mail.setPlayerTo(sendTo);
+                mail.setStatus(Mail.MailStatus.UNREAD);
                 mailbox.save(mail);
                 sender.sendMessage(String.format("%sMail Sent!", ChatColor.GREEN));
             } else if (args.length == 2 && args[0].equalsIgnoreCase("delete")){
                 Mail mail = mailbox.getMail(Integer.parseInt(args[1]));
-                if (!mail.playerTo.equalsIgnoreCase(sender.getName())){
+                if (!mail.getPlayerTo().equalsIgnoreCase(sender.getName())){
                     sender.sendMessage(String.format("%sYou can not delete another player's mail!", ChatColor.RED));
                     return true;
                 }
-                mail.deleted = true;
+                mail.setDeleted(true);
                 mailbox.save(mail);
             }
         } else if (command.getName().equalsIgnoreCase("mail-override")){
@@ -110,17 +110,17 @@ public class Mailer extends JavaPlugin {
             String messageFormat = "%s[%d] (%s) %s: %s";
 
             for (Mail m : mailList) {
-                if (m.status == Mail.MailStatus.UNREAD) {
-                    if (m.mail.length() < 50) {
-                        sender.sendMessage(String.format(messageFormat, ChatColor.GREEN, m.id, m.humanizeDate(), m.playerFrom, m.mail));
+                if (m.getStatus() == Mail.MailStatus.UNREAD) {
+                    if (m.getMail().length() < 50) {
+                        sender.sendMessage(String.format(messageFormat, ChatColor.GREEN, m.getId(), humanizeDate(m), m.getPlayerFrom(), m.getMail()));
                     } else {
-                        sender.sendMessage(String.format(messageFormat, ChatColor.GREEN, m.id, m.humanizeDate(), m.playerFrom, String.format("%s...", m.mail.substring(0, 47))));
+                        sender.sendMessage(String.format(messageFormat, ChatColor.GREEN, m.getId(), humanizeDate(m), m.getPlayerFrom(), String.format("%s...", m.getMail().substring(0, 47))));
                     }
-                } else if (m.status == Mail.MailStatus.READ) {
-                    if (m.mail.length() < 50) {
-                        sender.sendMessage(String.format(messageFormat, ChatColor.DARK_GREEN, m.id, m.humanizeDate(), m.playerFrom, m.mail));
+                } else if (m.getStatus() == Mail.MailStatus.READ) {
+                    if (m.getMail().length() < 50) {
+                        sender.sendMessage(String.format(messageFormat, ChatColor.DARK_GREEN, m.getId(), humanizeDate(m), m.getPlayerFrom(), m.getMail()));
                     } else {
-                        sender.sendMessage(String.format(messageFormat, ChatColor.DARK_GREEN, m.id, m.humanizeDate(), m.playerFrom, String.format("%s...", m.mail.substring(0, 47))));
+                        sender.sendMessage(String.format(messageFormat, ChatColor.DARK_GREEN, m.getId(), humanizeDate(m), m.getPlayerFrom(), String.format("%s...", m.getMail().substring(0, 47))));
                     }
                 }
             }
@@ -132,8 +132,8 @@ public class Mailer extends JavaPlugin {
         if (mail == null) {
             sender.sendMessage(String.format("%sThis mail doesn't exist.", ChatColor.RED));
         } else {
-            if (mail.playerTo.equalsIgnoreCase(owner)) {
-                mail.status = Mail.MailStatus.READ;
+            if (mail.getPlayerTo().equalsIgnoreCase(owner)) {
+                mail.setStatus(Mail.MailStatus.READ);
                 mailbox.save(mail);
             } else {
                 //If the player doesn't own the message AND they don't have permission, print error and return
@@ -141,9 +141,20 @@ public class Mailer extends JavaPlugin {
                     sender.sendMessage(String.format("%sAll you see is gibberish...(You don't have permission to read other's mail)", ChatColor.RED));
                     return;
                 }
-                sender.sendMessage(String.format("%s Mail sent from %s %s to %s. Status: %s", ChatColor.GOLD, mail.playerFrom, mail.humanizeDate(), mail.playerTo, (mail.status == Mail.MailStatus.READ ? "read" : "unread")));
+                sender.sendMessage(String.format("%s Mail sent from %s %s to %s. Status: %s", ChatColor.GOLD, mail.getPlayerFrom(), humanizeDate(mail), mail.getPlayerTo(), (mail.getStatus() == Mail.MailStatus.READ ? "read" : "unread")));
             }
-            sender.sendMessage(String.format("%s[%d] (%s) %s: %s", ChatColor.GOLD, mail.id, mail.humanizeDate(), mail.playerFrom, mail.mail));
+            sender.sendMessage(String.format("%s[%d] (%s) %s: %s", ChatColor.GOLD, mail.getId(), humanizeDate(mail), mail.getPlayerFrom(), mail.getMail()));
         }
     }
+    public String humanizeDate(Mail mail) {
+        int time = (int) (new Date().getTime() - mail.getMailTime().getTime()) / 1000 / 3600;
+
+        if (time == 1) {
+            return "1 hour ago";
+        } else {
+            return String.format("%d hours ago", time);
+        }
+
+    }
+
 }
