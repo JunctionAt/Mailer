@@ -85,7 +85,7 @@ public class Mail {
         return this.status;
     }
 
-    public boolean getDeleted() {
+    public boolean isDeleted() {
         return this.deleted;
     }
 
