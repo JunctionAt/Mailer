@@ -2,9 +2,10 @@ package at.junction.mailer;
 
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-public class MailerListener {
+public class MailerListener implements Listener {
     Mailer plugin;
 
     public MailerListener(Mailer plugin){

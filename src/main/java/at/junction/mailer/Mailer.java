@@ -3,6 +3,7 @@ package at.junction.mailer;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import at.junction.mailer.database.Mail;
@@ -33,6 +34,7 @@ public class Mailer extends JavaPlugin {
         //This plugin has no configuration
         mailbox = new MailBox(this);
         setupDatabase();
+        getServer().getPluginManager().registerEvents(new MailerListener(this), this);
     }
     @Override
     public ArrayList<Class<?>> getDatabaseClasses() {
@@ -77,6 +79,11 @@ public class Mailer extends JavaPlugin {
                 mail.setStatus(Mail.MailStatus.UNREAD);
                 mailbox.save(mail);
                 sender.sendMessage(String.format("%sMail Sent!", ChatColor.GREEN));
+
+                Player alert = getServer().getPlayer(sendTo);
+                if (alert != null){
+                    alert.sendMessage(String.format("%sYou have mail! Type /mail to read it", ChatColor.GREEN));
+                }
             } else if (args.length == 2 && args[0].equalsIgnoreCase("delete")){
                 Mail mail = mailbox.getMail(Integer.parseInt(args[1]));
                 if (!mail.getPlayerTo().equalsIgnoreCase(sender.getName())){
@@ -100,6 +107,22 @@ public class Mailer extends JavaPlugin {
                 String playerName = args[1];
                 sendMessage(sender, playerName, Integer.parseInt(args[2]));
             }
+        } else if (command.getName().equalsIgnoreCase("mailhelp")){
+
+            sender.sendMessage(String.format("%sMailer Help", ChatColor.GRAY));
+            sender.sendMessage(String.format("%s-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-", ChatColor.DARK_GRAY));
+            sender.sendMessage(String.format("%s/mail - View message overview", ChatColor.GRAY));
+            sender.sendMessage(String.format("%s/mail send <player> <message>- Send a message", ChatColor.GRAY));
+            sender.sendMessage(String.format("%s/mail read <id> - Read a given message", ChatColor.GRAY));
+            sender.sendMessage(String.format("%s/mail delete <id> - Delete a given message", ChatColor.GRAY));
+            if (sender.hasPermission("mailer.staff")){
+                sender.sendMessage(String.format("%s-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-", ChatColor.DARK_GRAY));
+                sender.sendMessage(String.format("%s/mail-override - View other messages", ChatColor.GRAY));
+                sender.sendMessage(String.format("%s/mail-override !to <player> - View messages to a user", ChatColor.GRAY));
+                sender.sendMessage(String.format("%s/mail-override !from <player> - View messages from a player", ChatColor.GRAY));
+                sender.sendMessage(String.format("%s/mail-override !read <player> <id> - Read a message to a player with a given ID", ChatColor.GRAY));
+            }
+
         }
         return true;
     }
@@ -109,7 +132,7 @@ public class Mailer extends JavaPlugin {
             sender.sendMessage(String.format("%sYou have no mail.", ChatColor.RED));
         } else {
             String messageFormat = "%s[%d] (%s) %s: %s";
-
+            sender.sendMessage(String.format("%s[id] (time) from: message", ChatColor.GOLD));
             for (Mail m : mailList) {
                 if (m.getStatus() == Mail.MailStatus.UNREAD) {
                     if (m.getMail().length() < 50) {

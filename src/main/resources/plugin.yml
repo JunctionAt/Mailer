@@ -12,6 +12,10 @@ commands:
     description: Access your mailbox
     permission: mailer.user
     usage: /mail <user> <message>
+  mailhelp:
+    description: Print help message
+    permission: mailer.user
+    usage: /mailhelp
   mail-override:
     description: Staff overrides
     permission: mailer.staff
