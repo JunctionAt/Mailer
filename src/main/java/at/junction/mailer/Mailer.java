@@ -131,20 +131,21 @@ public class Mailer extends JavaPlugin {
         if (mailList.size() == 0) {
             sender.sendMessage(String.format("%sYou have no mail.", ChatColor.RED));
         } else {
-            String messageFormat = "%s[%d] (%s) %s: %s";
-            sender.sendMessage(String.format("%s[id] (time) from: message", ChatColor.GOLD));
+            String messageFormat = "%s[%d] (%s) From: %s";
+            sender.sendMessage(String.format("%sType /mail read <id> to read a message, or /mail delete <id> to remove it", ChatColor.GOLD));
+            sender.sendMessage(String.format("%s[id] (time) from", ChatColor.GOLD));
             for (Mail m : mailList) {
                 if (m.getStatus() == Mail.MailStatus.UNREAD) {
                     if (m.getMail().length() < 50) {
-                        sender.sendMessage(String.format(messageFormat, ChatColor.GREEN, m.getId(), humanizeDate(m), m.getPlayerFrom(), m.getMail()));
+                        sender.sendMessage(String.format(messageFormat, ChatColor.GREEN, m.getId(), humanizeDate(m), m.getPlayerFrom()));
                     } else {
-                        sender.sendMessage(String.format(messageFormat, ChatColor.GREEN, m.getId(), humanizeDate(m), m.getPlayerFrom(), String.format("%s...", m.getMail().substring(0, 47))));
+                        sender.sendMessage(String.format(messageFormat, ChatColor.GREEN, m.getId(), humanizeDate(m), m.getPlayerFrom()));
                     }
                 } else if (m.getStatus() == Mail.MailStatus.READ) {
                     if (m.getMail().length() < 50) {
-                        sender.sendMessage(String.format(messageFormat, ChatColor.DARK_GREEN, m.getId(), humanizeDate(m), m.getPlayerFrom(), m.getMail()));
+                        sender.sendMessage(String.format(messageFormat, ChatColor.DARK_GREEN, m.getId(), humanizeDate(m), m.getPlayerFrom()));
                     } else {
-                        sender.sendMessage(String.format(messageFormat, ChatColor.DARK_GREEN, m.getId(), humanizeDate(m), m.getPlayerFrom(), String.format("%s...", m.getMail().substring(0, 47))));
+                        sender.sendMessage(String.format(messageFormat, ChatColor.DARK_GREEN, m.getId(), humanizeDate(m), m.getPlayerFrom()));
                     }
                 }
             }
