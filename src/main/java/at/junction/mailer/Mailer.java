@@ -58,7 +58,7 @@ public class Mailer extends JavaPlugin {
         if (command.getName().equalsIgnoreCase("mail")) {
             if (args.length == 0) {
                 //Show user their inbox
-                sendMessages(sender, sender.getName(), mailbox.getUnreadMails(sender.getName()));
+                sendMessages(sender, sender.getName(), mailbox.getUserMails(sender.getName()));
             } else if (args.length == 2 && args[0].equalsIgnoreCase("read")) {
                 //Send user a single message, id = args[1]
                 sendMessage(sender, sender.getName(), Integer.parseInt(args[1]));
