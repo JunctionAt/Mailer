@@ -9,6 +9,7 @@ import at.junction.mailer.database.Mail;
 import at.junction.mailer.database.MailBox;
 
 import javax.persistence.PersistenceException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -31,7 +32,13 @@ public class Mailer extends JavaPlugin {
     public void onEnable() {
         //This plugin has no configuration
         mailbox = new MailBox(this);
-
+        setupDatabase();
+    }
+    @Override
+    public ArrayList<Class<?>> getDatabaseClasses() {
+        ArrayList<Class<?>> list = new ArrayList<>();
+        list.add(Mail.class);
+        return list;
     }
 
     @Override
