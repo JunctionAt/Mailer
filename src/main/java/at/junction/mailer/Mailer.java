@@ -57,6 +57,8 @@ public class Mailer extends JavaPlugin {
         * /mail send player message - send message
         *
          */
+        String sendTo;
+        String[] messageArray;
         if (command.getName().equalsIgnoreCase("mail")) {
             if (args.length == 0) {
                 //Show user their inbox
@@ -65,25 +67,9 @@ public class Mailer extends JavaPlugin {
                 //Send user a single message, id = args[1]
                 sendMessage(sender, sender.getName(), Integer.parseInt(args[1]));
             } else if (args.length > 2 && args[0].equalsIgnoreCase("send")) {
-                StringBuilder message = new StringBuilder();
-                String sendTo = args[1];
-                for (int i = 2; i < args.length; i++)
-                    message.append(args[i]).append(' ');
-                message.substring(0, message.length() - 1);
-                Mail mail = new Mail();
-                mail.setMail(message.toString());
-                mail.setDeleted(false);
-                mail.setMailTime(new Date());
-                mail.setPlayerFrom(sender.getName());
-                mail.setPlayerTo(sendTo);
-                mail.setStatus(Mail.MailStatus.UNREAD);
-                mailbox.save(mail);
-                sender.sendMessage(String.format("%sMail Sent!", ChatColor.GREEN));
-
-                Player alert = getServer().getPlayer(sendTo);
-                if (alert != null){
-                    alert.sendMessage(String.format("%sYou have mail! Type /mail to read it", ChatColor.GREEN));
-                }
+                sendTo = args[1];
+                messageArray = Array.copyOfRange(args, 2, args.length);
+                mailSend(sendTo, messageArray);
             } else if (args.length == 2 && args[0].equalsIgnoreCase("delete")){
                 Mail mail = mailbox.getMail(Integer.parseInt(args[1]));
                 if (!mail.getPlayerTo().equalsIgnoreCase(sender.getName())){
@@ -92,6 +78,11 @@ public class Mailer extends JavaPlugin {
                 }
                 mail.setDeleted(true);
                 mailbox.save(mail);
+            } else if (args.length > 1) {
+                // Default to send when no valid subcommand is given
+                sendTo = args[0];
+                messageArray = Array.copyOfRange(args, 1, args.length);
+                mailSend(sendTo, messageArray);
             }
         } else if (command.getName().equalsIgnoreCase("mail-override")){
             if (args.length <= 1){
@@ -169,6 +160,26 @@ public class Mailer extends JavaPlugin {
                 sender.sendMessage(String.format("%s Mail sent from %s %s to %s. Status: %s", ChatColor.GOLD, mail.getPlayerFrom(), humanizeDate(mail), mail.getPlayerTo(), (mail.getStatus() == Mail.MailStatus.READ ? "read" : "unread")));
             }
             sender.sendMessage(String.format("%s[%d] (%s) %s: %s", ChatColor.GOLD, mail.getId(), humanizeDate(mail), mail.getPlayerFrom(), mail.getMail()));
+        }
+    }
+    private void mailSend(String sendTo, String[] messageArray) {
+        StringBuilder message = new StringBuilder();
+        for (int i = 0; i < messageArray.length; i++)
+            message.append(messageArray[i]).append(' ');
+        message.substring(0, message.length() - 1);
+        Mail mail = new Mail();
+        mail.setMail(message.toString());
+        mail.setDeleted(false);
+        mail.setMailTime(new Date());
+        mail.setPlayerFrom(sender.getName());
+        mail.setPlayerTo(sendTo);
+        mail.setStatus(Mail.MailStatus.UNREAD);
+        mailbox.save(mail);
+        sender.sendMessage(String.format("%sMail Sent!", ChatColor.GREEN));
+
+        Player alert = getServer().getPlayer(sendTo);
+        if (alert != null){
+            alert.sendMessage(String.format("%sYou have mail! Type /mail to read it", ChatColor.GREEN));
         }
     }
     public String humanizeDate(Mail mail) {
