@@ -11,6 +11,7 @@ import at.junction.mailer.database.MailBox;
 
 import javax.persistence.PersistenceException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -68,8 +69,10 @@ public class Mailer extends JavaPlugin {
                 sendMessage(sender, sender.getName(), Integer.parseInt(args[1]));
             } else if (args.length > 2 && args[0].equalsIgnoreCase("send")) {
                 sendTo = args[1];
-                messageArray = Array.copyOfRange(args, 2, args.length);
-                mailSend(sendTo, messageArray);
+                messageArray = Arrays.copyOfRange(args, 2, args.length);
+                mailSend(sender.getName(), sendTo, messageArray);
+                sender.sendMessage(String.format("%sMail Sent!", ChatColor.GREEN));
+
             } else if (args.length == 2 && args[0].equalsIgnoreCase("delete")){
                 Mail mail = mailbox.getMail(Integer.parseInt(args[1]));
                 if (!mail.getPlayerTo().equalsIgnoreCase(sender.getName())){
@@ -81,8 +84,9 @@ public class Mailer extends JavaPlugin {
             } else if (args.length > 1) {
                 // Default to send when no valid subcommand is given
                 sendTo = args[0];
-                messageArray = Array.copyOfRange(args, 1, args.length);
-                mailSend(sendTo, messageArray);
+                messageArray = Arrays.copyOfRange(args, 1, args.length);
+                mailSend(sender.getName(), sendTo, messageArray);
+                sender.sendMessage(String.format("%sMail Sent!", ChatColor.GREEN));
             }
         } else if (command.getName().equalsIgnoreCase("mail-override")){
             if (args.length <= 1){
@@ -162,7 +166,7 @@ public class Mailer extends JavaPlugin {
             sender.sendMessage(String.format("%s[%d] (%s) %s: %s", ChatColor.GOLD, mail.getId(), humanizeDate(mail), mail.getPlayerFrom(), mail.getMail()));
         }
     }
-    private void mailSend(String sendTo, String[] messageArray) {
+    private void mailSend(String sendFrom, String sendTo, String[] messageArray) {
         StringBuilder message = new StringBuilder();
         for (int i = 0; i < messageArray.length; i++)
             message.append(messageArray[i]).append(' ');
@@ -171,11 +175,11 @@ public class Mailer extends JavaPlugin {
         mail.setMail(message.toString());
         mail.setDeleted(false);
         mail.setMailTime(new Date());
-        mail.setPlayerFrom(sender.getName());
+        mail.setPlayerFrom(sendFrom);
         mail.setPlayerTo(sendTo);
         mail.setStatus(Mail.MailStatus.UNREAD);
         mailbox.save(mail);
-        sender.sendMessage(String.format("%sMail Sent!", ChatColor.GREEN));
+
 
         Player alert = getServer().getPlayer(sendTo);
         if (alert != null){
